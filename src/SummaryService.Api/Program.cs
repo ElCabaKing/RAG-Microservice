@@ -135,7 +135,7 @@ app.MapPost("/api/v1/summaries/stream", async (HttpContext context, Cancellation
     var validator = requestServices.GetRequiredService<IValidator<SummaryRequestDto>>();
 
     var form = await context.Request.ReadFormAsync(ct);
-    var file = form.Files.GetFile("file");
+    var file = form.Files.GetFile("file")!;
 
     SummaryStyle? style = null;
     if (Enum.TryParse<SummaryStyle>(context.Request.Query["style"].ToString(), true, out var parsedStyle))
@@ -153,7 +153,7 @@ app.MapPost("/api/v1/summaries/stream", async (HttpContext context, Cancellation
     var options = summaryOptions.Value;
     var request = new SummaryRequestDto
     {
-        File = file,
+        File = file!,
         Style = style ?? SummaryStyle.General,
         MaxTokens = maxTokens ?? options.MaxTokens
     };
