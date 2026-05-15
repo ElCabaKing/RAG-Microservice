@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch SummaryService.Api",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build SummaryService.Api",
+      "program": "${workspaceFolder}/src/SummaryService.Api/bin/Debug/net9.0/SummaryService.Api.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/SummaryService.Api",
+      "stopAtEntry": false,
+      "console": "internalConsole",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
+}

@@ -14,6 +14,34 @@ El sistema debe ser:
 
 ---
 
+# Estado Actual
+
+## Fases completadas
+- La Fase 1 quedó implementada y validada.
+- La Fase 2 quedó implementada y validada.
+- La solución compila correctamente.
+
+## Estado técnico actual
+- Solución renombrada a `SummaryService.*`.
+- `Swagger` y `/health` funcionan.
+- `Serilog` está activo.
+- `User Secrets` está inicializado en la API.
+- El endpoint SSE responde con `status`, `chunk`, `completed` y `error` con contrato estructurado.
+- Se implementaron enums, constants, value objects y exceptions de dominio.
+- Se definieron DTOs de request/response para streaming.
+- Se crearon validators base y contratos core de Application.
+- Se creó estructura `Features/Summaries` para CQRS ligero.
+- Se agregó result pattern (`Result` y `Result<T>`) y helpers base en Shared.
+- Se agregó carpeta `Prompts/` con `summarize.txt` y `reduce.txt`.
+- Se agregaron opciones strongly typed adicionales: `OcrOptions` y `ChunkingOptions`.
+
+## Convención de secretos
+- La API key de Groq debe guardarse como `Groq:ApiKey`.
+- En desarrollo local se usa `User Secrets`.
+- En despliegues se puede usar la variable de entorno `Groq__ApiKey`.
+
+---
+
 # Stack y decisiones técnicas tomadas
 
 ## Plataforma

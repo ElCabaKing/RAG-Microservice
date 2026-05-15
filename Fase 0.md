@@ -107,11 +107,11 @@ No deben utilizarse librerías Windows-only.
 ```text
 src/
 
-├── Rag.Api
-├── Rag.Application
-├── Rag.Domain
-├── Rag.Infrastructure
-└── Rag.Shared
+├── Summary.Api
+├── Summary.Application
+├── Summary.Domain
+├── Summary.Infrastructure
+└── Summary.Shared
 ```
 
 ---
