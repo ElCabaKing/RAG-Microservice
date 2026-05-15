@@ -12,7 +12,7 @@ namespace SummaryService.Infrastructure.Services;
 /// Servicio orquestador principal para procesamiento documental.
 /// Coordina validación, parsing, normalización y retorno de contenido listo para chunking.
 /// </summary>
-public sealed class DocumentProcessingService
+public sealed class DocumentProcessingService : IDocumentProcessingService
 {
     private readonly DocumentParserFactory _parserFactory;
     private readonly TextNormalizer _textNormalizer;

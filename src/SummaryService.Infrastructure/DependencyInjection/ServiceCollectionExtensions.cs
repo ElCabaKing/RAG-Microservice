@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<PdfOcrDetectionStrategy>();
         services.AddScoped<SmartPdfProcessor>();
         services.AddScoped<DocumentParserFactory>();
-        services.AddScoped<DocumentProcessingService>();
+        services.AddScoped<IDocumentProcessingService, DocumentProcessingService>();
 
         return services;
     }

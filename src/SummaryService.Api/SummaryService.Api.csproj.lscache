@@ -421,7 +421,6 @@ Program.cs
  system.text.encodings.web/10.0.6/lib/net9.0/System.Text.Encodings.Web.dll
  system.text.json/10.0.6/lib/net9.0/System.Text.Json.dll
  system.threading.channels/10.0.6/lib/net9.0/System.Threading.Channels.dll
- tesseract/5.2.0/lib/netstandard2.0/Tesseract.dll
  uglytoad.pdfpig.core/1.7.0-custom-5/lib/net6.0/UglyToad.PdfPig.Core.dll
  uglytoad.pdfpig.fonts/1.7.0-custom-5/lib/net6.0/UglyToad.PdfPig.Fonts.dll
  uglytoad.pdfpig.tokenization/1.7.0-custom-5/lib/net6.0/UglyToad.PdfPig.Tokenization.dll

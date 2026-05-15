@@ -1,19 +1,18 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using SummaryService.Application.Interfaces;
-using Tesseract;
 
 namespace SummaryService.Infrastructure.Services;
 
 /// <summary>
-/// Extractor de texto mediante OCR usando Tesseract.
+/// Extractor de texto mediante OCR usando Tesseract CLI.
 /// Procesa imágenes de páginas PDF y retorna texto reconocido.
 /// </summary>
 public sealed class PdfOcrExtractor : IPdfOcrExtractor, IAsyncDisposable
 {
     private readonly IPdfRenderer _pdfRenderer;
     private readonly ILogger<PdfOcrExtractor> _logger;
-    private TesseractEngine? _tesseractEngine;
     private readonly int _maxPages;
     private readonly int _timeoutSeconds;
     private bool _disposed;
@@ -28,25 +27,6 @@ public sealed class PdfOcrExtractor : IPdfOcrExtractor, IAsyncDisposable
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _maxPages = maxPages;
         _timeoutSeconds = timeoutSeconds;
-
-        InitializeTesseract();
-    }
-
-    /// <summary>
-    /// Inicializa el motor de Tesseract.
-    /// </summary>
-    private void InitializeTesseract()
-    {
-        try
-        {
-            _logger.LogDebug("Inicializando Tesseract OCR Engine con idiomas: eng, spa");
-            _tesseractEngine = new TesseractEngine(@"./tessdata", "eng+spa", EngineMode.Default);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error al inicializar Tesseract Engine");
-            throw;
-        }
     }
 
     /// <summary>
@@ -72,7 +52,10 @@ public sealed class PdfOcrExtractor : IPdfOcrExtractor, IAsyncDisposable
         {
             // 1. Renderizar PDF a imágenes
             _logger.LogInformation("Renderizando PDF a imágenes...");
-            var pageImages = await _pdfRenderer.RenderPagesAsync(pdfStream, cancellationToken);
+
+            var pageImages = await _pdfRenderer.RenderPagesAsync(
+                pdfStream,
+                cancellationToken);
 
             if (pageImages.Count > _maxPages)
             {
@@ -80,50 +63,66 @@ public sealed class PdfOcrExtractor : IPdfOcrExtractor, IAsyncDisposable
                     "El PDF excede el límite de páginas permitidas ({PageCount} > {MaxPages})",
                     pageImages.Count,
                     _maxPages);
+
                 throw new InvalidOperationException(
                     $"El PDF tiene {pageImages.Count} páginas, máximo permitido: {_maxPages}");
             }
 
-            _logger.LogInformation("PDF renderizado: {PageCount} páginas", pageImages.Count);
+            _logger.LogInformation(
+                "PDF renderizado: {PageCount} páginas",
+                pageImages.Count);
 
-            // 2. Procesar cada página con OCR
+            // 2. Procesar páginas con OCR
             var ocrTexts = new ConcurrentBag<(int PageIndex, string Text)>();
-            
+
             var options = new ParallelOptions
             {
                 CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 2 // Limitar paralelismo para controlar memoria
+                MaxDegreeOfParallelism = 2
             };
 
-            await Task.Run(
-                () => Parallel.ForEach(pageImages.Select((bytes, idx) => (idx, bytes)), options, (item, loopState) =>
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    var (pageIndex, imageBytes) = item;
-
-                    _logger.LogDebug("Procesando página {PageNumber} con OCR...", pageIndex + 1);
-
-                    try
+            await Task.Run(() =>
+            {
+                Parallel.ForEach(
+                    pageImages.Select((bytes, idx) => (idx, bytes)),
+                    options,
+                    item =>
                     {
-                        var pageText = ProcessPageWithOcr(imageBytes, pageIndex);
-                        ocrTexts.Add((pageIndex, pageText));
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        var (pageIndex, imageBytes) = item;
 
                         _logger.LogDebug(
-                            "Página {PageNumber} procesada. Texto extraído: {TextLength} caracteres",
-                            pageIndex + 1,
-                            pageText.Length);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(
-                            ex,
-                            "Error procesando página {PageNumber} con OCR",
+                            "Procesando página {PageNumber} con OCR...",
                             pageIndex + 1);
-                        ocrTexts.Add((pageIndex, string.Empty));
-                    }
-                }),
-                cancellationToken);
+
+                        try
+                        {
+                            var pageText = ProcessPageWithOcrAsync(
+                                    imageBytes,
+                                    pageIndex,
+                                    cancellationToken)
+                                .GetAwaiter()
+                                .GetResult();
+
+                            ocrTexts.Add((pageIndex, pageText));
+
+                            _logger.LogDebug(
+                                "Página {PageNumber} procesada. Texto extraído: {TextLength} caracteres",
+                                pageIndex + 1,
+                                pageText.Length);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogWarning(
+                                ex,
+                                "Error procesando página {PageNumber} con OCR",
+                                pageIndex + 1);
+
+                            ocrTexts.Add((pageIndex, string.Empty));
+                        }
+                    });
+            }, cancellationToken);
 
             // 3. Combinar textos en orden
             var combinedText = string.Join(
@@ -156,51 +155,105 @@ public sealed class PdfOcrExtractor : IPdfOcrExtractor, IAsyncDisposable
     }
 
     /// <summary>
-    /// Procesa una página individual con OCR.
+    /// Procesa una página individual usando Tesseract CLI.
     /// </summary>
-    private string ProcessPageWithOcr(byte[] imageBytes, int pageIndex)
+    private async Task<string> ProcessPageWithOcrAsync(
+        byte[] imageBytes,
+        int pageIndex,
+        CancellationToken cancellationToken)
     {
-        if (_tesseractEngine == null)
-        {
-            throw new InvalidOperationException("Tesseract Engine no está inicializado");
-        }
+        var tempDirectory = Path.Combine(
+            Path.GetTempPath(),
+            "summary-service-ocr");
+
+        Directory.CreateDirectory(tempDirectory);
+
+        var imagePath = Path.Combine(
+            tempDirectory,
+            $"ocr-page-{Guid.NewGuid()}.png");
 
         try
         {
-            using var image = Pix.LoadFromMemory(imageBytes);
-            using var page = _tesseractEngine.Process(image);
-            
-            var text = page.GetText();
-            
-            if (string.IsNullOrWhiteSpace(text))
+            await File.WriteAllBytesAsync(
+                imagePath,
+                imageBytes,
+                cancellationToken);
+
+            using var process = new Process();
+
+            process.StartInfo = new ProcessStartInfo
             {
-                _logger.LogWarning("Página {PageNumber} no contiene texto reconocible", pageIndex + 1);
+                FileName = "tesseract",
+                Arguments = $"\"{imagePath}\" stdout -l eng+spa",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            _logger.LogDebug(
+                "Ejecutando OCR para página {PageNumber}",
+                pageIndex + 1);
+
+            process.Start();
+
+            var outputTask = process.StandardOutput.ReadToEndAsync(cancellationToken);
+
+            var errorTask = process.StandardError.ReadToEndAsync(cancellationToken);
+
+            using var timeoutCts =
+                CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            timeoutCts.CancelAfter(TimeSpan.FromSeconds(_timeoutSeconds));
+
+            await process.WaitForExitAsync(timeoutCts.Token);
+
+            var output = await outputTask;
+            var error = await errorTask;
+
+            if (process.ExitCode != 0)
+            {
+                throw new InvalidOperationException(
+                    $"Tesseract OCR falló para página {pageIndex + 1}: {error}");
+            }
+
+            if (string.IsNullOrWhiteSpace(output))
+            {
+                _logger.LogWarning(
+                    "Página {PageNumber} no contiene texto reconocible",
+                    pageIndex + 1);
+
                 return string.Empty;
             }
 
-            return text;
+            return output.Trim();
         }
-        catch (Exception ex)
+        finally
         {
-            _logger.LogError(ex, "Error procesando página {PageNumber}", pageIndex + 1);
-            throw;
+            try
+            {
+                if (File.Exists(imagePath))
+                {
+                    File.Delete(imagePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "No se pudo eliminar archivo temporal OCR: {ImagePath}",
+                    imagePath);
+            }
         }
     }
 
     /// <summary>
-    /// Libera recursos de Tesseract.
+    /// Libera recursos.
     /// </summary>
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        if (_disposed)
-        {
-            return;
-        }
-
-        _logger.LogDebug("Liberando recursos de Tesseract OCR");
-        _tesseractEngine?.Dispose();
         _disposed = true;
-        await Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     private void ThrowIfDisposed()

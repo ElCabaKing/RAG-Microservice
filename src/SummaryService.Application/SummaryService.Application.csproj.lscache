@@ -61,6 +61,7 @@ DTOs/
  SummaryRequestDto.cs
 Interfaces/
  IDocumentParser.cs
+ IDocumentProcessingService.cs
  IPdfOcrExtractor.cs
  IPdfRenderer.cs
  IPdfTextExtractor.cs
