@@ -17,14 +17,15 @@ El sistema debe ser:
 # Estado Actual
 
 ## Fases completadas
-- La Fase 1 quedó implementada y validada.
-- La Fase 2 quedó implementada y validada.
-- La solución compila correctamente.
+- ✅ Fase 1 — Completada y validada
+- ✅ Fase 2 — Completada y validada
+- ✅ Fase 3 — Completada y validada (15 de mayo de 2026)
+- ⏳ Fase 4 — Por comenzar (Chunking)
 
 ## Estado técnico actual
 - Solución renombrada a `SummaryService.*`.
 - `Swagger` y `/health` funcionan.
-- `Serilog` está activo.
+- `Serilog` está activo con logging estratégico.
 - `User Secrets` está inicializado en la API.
 - El endpoint SSE responde con `status`, `chunk`, `completed` y `error` con contrato estructurado.
 - Se implementaron enums, constants, value objects y exceptions de dominio.
@@ -33,7 +34,23 @@ El sistema debe ser:
 - Se creó estructura `Features/Summaries` para CQRS ligero.
 - Se agregó result pattern (`Result` y `Result<T>`) y helpers base en Shared.
 - Se agregó carpeta `Prompts/` con `summarize.txt` y `reduce.txt`.
-- Se agregaron opciones strongly typed adicionales: `OcrOptions` y `ChunkingOptions`.
+- Se agregaron opciones strongly typed: `OcrOptions`, `ChunkingOptions`, `SummaryOptions`.
+
+## Componentes de Fase 3 Implementados
+- ✅ `TxtDocumentParser` — Lectura de archivos TXT
+- ✅ `PdfTextExtractor` — Extracción nativa con PdfPig
+- ✅ `PdfRenderer` — Renderización a imágenes (Docnet)
+- ✅ `PdfOcrExtractor` — OCR con Tesseract
+- ✅ `PdfOcrDetectionStrategy` — Decisión inteligente de OCR
+- ✅ `SmartPdfProcessor` — Procesamiento inteligente de PDFs
+- ✅ `DocumentParserFactory` — Fábrica de parsers
+- ✅ `DocumentProcessingService` — Orquestador principal
+- ✅ `TextNormalizer` — Normalización de texto
+
+## Compilación
+- ✅ Exitosa sin errores
+- ✅ Todas las dependencias resueltas
+- ✅ Arquitectura limpia mantenida
 
 ## Convención de secretos
 - La API key de Groq debe guardarse como `Groq:ApiKey`.
@@ -405,40 +422,71 @@ public interface IPdfProcessingStrategy
 ## Fase actual
 
 ```text
-FASE 0 — Definición técnica y arquitectura
+FASE 3 — Completada ✅
+FASE 4 — En Preparación ⏳
 ```
 
 ---
 
-# Objetivo de la Fase 0
+# Progreso Actual
 
-Definir:
-- estructura final
-- dependencias
-- contratos
-- estándares
-- estrategia operacional
-- arquitectura definitiva
+## Fases Completadas
+- ✅ **Fase 0** — Arquitectura y estructura
+- ✅ **Fase 1** — Configuración e infraestructura
+- ✅ **Fase 2** — Enums, DTOs, validators, exceptions
+- ✅ **Fase 3** — Pipeline de documentos y OCR
+- ⏳ **Fase 4** — Chunking de documentos (próxima)
 
-ANTES de comenzar implementación.
+## Compilación
+- ✅ Exitosa sin errores
+- ✅ Todas las dependencias resueltas
+
+## Estructura Actual
+```
+Domain → Application → Infrastructure → API
+  (desacoplado)  (interfaces)  (implementación)  (endpoints)
+```
+
+**Documentación por Fase:**
+- Detalles Fase 0: [Fase 0.md](Fase%200.md)
+- Detalles Fase 1: [Fase 1.md](Fase%201.md)
+- Detalles Fase 2: [Fase 2.md](Fase%202.md)
+- Detalles Fase 3: [Fase 3.md](Fase%203.md) ✅
+- Detalles Fase 4: [Fase 4.md](Fase%204.md) ⏳
+
+**Progreso General:** [PROGRESS.md](PROGRESS.md)
 
 ---
 
-# Checklist maestro ya definido
+# Objetivo de la Próxima Fase (Fase 4)
 
-Existe un roadmap completo de:
-- Fase 0 → Fase 14
+Implementar el pipeline de **segmentación inteligente** de documentos:
 
-Incluyendo:
-- arquitectura
-- OCR
-- chunking
-- streaming
-- integración Groq
-- resiliencia
-- testing
-- Docker
-- hardening
-- release funcional final
+```text
+Texto Normalizado
+ ↓
+ITextChunker (estrategias múltiples)
+ ↓
+Chunks con control de tokens
+ ↓
+Validación
+ ↓
+Listo para MAP phase
+```
+
+**Duración estimada:** 2-3 días de desarrollo
+
+---
+
+# Objetivo General del Proyecto
+
+Terminar con un microservicio completamente funcional:
+- recibir documentos PDF/TXT
+- procesar y normalizar
+- fragmentar inteligentemente
+- generar resúmenes con LLM (Groq + Llama)
+- hacer streaming en tiempo real
+- arquitectura limpia y mantenible
+- sin deuda técnica temprana
 
 El objetivo es terminar con un proyecto completamente funcional y consistente sin deuda técnica temprana.

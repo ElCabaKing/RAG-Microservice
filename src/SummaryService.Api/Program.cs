@@ -9,7 +9,6 @@ using SummaryService.Application.Interfaces;
 using SummaryService.Application.Validators;
 using SummaryService.Domain.Constants;
 using SummaryService.Domain.Enums;
-using SummaryService.Infrastructure.Services;
 using Serilog;
 using System.Text.Json;
 
