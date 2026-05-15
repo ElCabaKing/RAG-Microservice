@@ -388,7 +388,7 @@ UnitTest1.cs
  microsoft.extensions.options/10.0.8/lib/net9.0/Microsoft.Extensions.Options.dll
  microsoft.extensions.primitives/10.0.8/lib/net9.0/Microsoft.Extensions.Primitives.dll
  microsoft.extensions.vectordata.abstractions/10.1.0/lib/net8.0/Microsoft.Extensions.VectorData.Abstractions.dll
- microsoft.openapi/2.4.1/lib/net8.0/Microsoft.OpenApi.dll
+ microsoft.openapi/1.6.17/lib/netstandard2.0/Microsoft.OpenApi.dll
  microsoft.semantickernel.abstractions/1.76.0/lib/net8.0/Microsoft.SemanticKernel.Abstractions.dll
  microsoft.semantickernel.connectors.azureopenai/1.76.0/lib/net8.0/Microsoft.SemanticKernel.Connectors.AzureOpenAI.dll
  microsoft.semantickernel.connectors.openai/1.76.0/lib/net8.0/Microsoft.SemanticKernel.Connectors.OpenAI.dll
@@ -409,6 +409,7 @@ UnitTest1.cs
  polly.core/8.6.6/lib/net8.0/Polly.Core.dll
  polly.extensions.http/3.0.0/lib/netstandard2.0/Polly.Extensions.Http.dll
  polly/8.6.6/lib/net6.0/Polly.dll
+ scalar.aspnetcore/2.14.14/lib/net9.0/Scalar.AspNetCore.dll
  serilog.aspnetcore/10.0.0/lib/net9.0/Serilog.AspNetCore.dll
  serilog.extensions.hosting/10.0.0/lib/net9.0/Serilog.Extensions.Hosting.dll
  serilog.extensions.logging/10.0.0/lib/net9.0/Serilog.Extensions.Logging.dll
@@ -418,9 +419,6 @@ UnitTest1.cs
  serilog.sinks.debug/3.0.0/lib/net8.0/Serilog.Sinks.Debug.dll
  serilog.sinks.file/7.0.0/lib/net9.0/Serilog.Sinks.File.dll
  serilog/4.3.0/lib/net9.0/Serilog.dll
- swashbuckle.aspnetcore.swagger/10.1.7/lib/net9.0/Swashbuckle.AspNetCore.Swagger.dll
- swashbuckle.aspnetcore.swaggergen/10.1.7/lib/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
- swashbuckle.aspnetcore.swaggerui/10.1.7/lib/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
  system.clientmodel/1.10.0/lib/net9.0/System.ClientModel.dll
  system.diagnostics.diagnosticsource/10.0.8/lib/net9.0/System.Diagnostics.DiagnosticSource.dll
  system.io.pipelines/10.0.6/lib/net9.0/System.IO.Pipelines.dll

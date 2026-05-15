@@ -12,6 +12,7 @@ using SummaryService.Domain.Enums;
 using Serilog;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 var jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
@@ -27,7 +28,7 @@ builder.Services.Configure<SummaryOptions>(builder.Configuration.GetSection(Summ
 builder.Services.Configure<OcrOptions>(builder.Configuration.GetSection(OcrOptions.SectionName));
 builder.Services.Configure<ChunkingOptions>(builder.Configuration.GetSection(ChunkingOptions.SectionName));
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddScoped<IValidator<SummaryRequestDto>, SummaryRequestValidator>();
 builder.Services.AddRagServices();
@@ -38,9 +39,6 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseSerilogRequestLogging();
 
-app.UseSwagger();
-app.UseSwaggerUI();
-
 app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health", new HealthCheckOptions
@@ -50,7 +48,12 @@ app.MapHealthChecks("/health", new HealthCheckOptions
         context.Response.ContentType = "application/json";
         await context.Response.WriteAsync("{\"status\":\"Healthy\"}", context.RequestAborted);
     }
-});
+})
+.WithName("HealthCheck")
+.WithDescription("Verifica el estado de salud de la API")
+.WithSummary("Health Check")
+.WithOpenApi()
+.WithTags("Health");
 
 // ========== TESTING EXTRACTORS - TEMPORARY ENDPOINT FOR DEVELOPMENT ==========
 // REMOVE THIS SECTION WHEN TESTING IS COMPLETE
@@ -123,8 +126,20 @@ async (
 })
 .DisableAntiforgery()
 .WithName("TestExtractors")
-.WithDescription("TEST ENDPOINT - Extract text from documents without full pipeline. Remove when done testing.");
+.WithDescription("Extrae texto de un documento sin ejecutar el pipeline completo de resumen. Útil para probar los extractores de documentos.")
+.WithSummary("Testear Extractores de Documentos")
+.WithOpenApi()
+.Produces<object>(StatusCodes.Status200OK, "application/json")
+.Produces<object>(StatusCodes.Status400BadRequest, "application/json")
+.Produces<object>(StatusCodes.Status500InternalServerError, "application/json")
+.WithTags("Testing");
 // ========== END TESTING SECTION ==========
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 
 app.MapPost("/api/v1/summaries/stream", async (HttpContext context, CancellationToken ct) =>
@@ -188,7 +203,15 @@ app.MapPost("/api/v1/summaries/stream", async (HttpContext context, Cancellation
     await WriteSseAsync(response, SseEvents.Completed, new { }, ct);
 })
 .Accepts<IFormFile>("multipart/form-data")
-.DisableAntiforgery();
+.DisableAntiforgery()
+.WithName("GenerateSummary")
+.WithDescription("Genera un resumen de un documento mediante streaming SSE. Extrae el texto, lo divide en chunks, y usa un modelo de IA para generar y reducir el resumen de forma progresiva.")
+.WithSummary("Generar Resumen de Documento con Streaming")
+.WithOpenApi()
+.Produces(StatusCodes.Status200OK)
+.Produces<ErrorResponseDto>(StatusCodes.Status400BadRequest)
+.Produces<ErrorResponseDto>(StatusCodes.Status500InternalServerError)
+.WithTags("Summaries");
 
 app.Run();
 
