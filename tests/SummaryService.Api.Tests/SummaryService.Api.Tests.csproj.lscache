@@ -54,7 +54,7 @@ TemporaryDependencyNodeTargetIdentifier=net9.0
 
 [sourceFiles]
 <NUGET>/microsoft.net.test.sdk/17.12.0/build/netcoreapp3.1/Microsoft.NET.Test.Sdk.Program.cs
- @folderNames=..,..,..,..,.nuget,packages,microsoft.net.test.sdk,17.12.0,build,netcoreapp3.1
+ @folderNames=..,..,..,..,..,.nuget,packages,microsoft.net.test.sdk,17.12.0,build,netcoreapp3.1
 Documents/
  PdfTextExtractorTests.cs
  TxtDocumentParserTests.cs

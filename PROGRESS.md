@@ -1,290 +1,103 @@
 # Progreso del Proyecto — RAG Microservice
 
-**Última actualización:** 15 de mayo de 2026
-
----
-
-## Resumen General
-
-| Métrica | Estado |
-|---------|--------|
-| **Fases Completadas** | 3 de 5 |
-| **Compilación** | ✅ Exitosa |
-| **Arquitectura** | ✅ Limpia |
-| **Tests** | ⏳ Pendiente |
-
----
-
-## Fase 0 — Arquitectura y Estructura ✅
-
-**Estado:** Completada (Fase Base)
-
-**Logros:**
-- Estructura Clean Architecture definida
-- Proyecto renombrado a `SummaryService.*`
-- Todas las carpetas core creadas
-- Convenciones técnicas establecidas
-
-**Componentes:**
-- Domain: Enums base (`ProcessingState`)
-- Application: Interfaces core (`ISummaryGenerator`, `IPdfTextExtractor`)
-- Infrastructure: Placeholder implementations
-- API: Endpoint SSE esqueleto
-
----
-
-## Fase 1 — Configuración e Infraestructura ✅
-
-**Estado:** Completada
-
-**Logros:**
-- Serilog + logging estructurado
-- Swagger + OpenAPI
-- Health checks
-- User Secrets
-- FluentValidation
-- Polly (resiliencia)
-- Serilog sinks configurados
-
-**Componentes Instalados:**
-- Paquetes NuGet requeridos
-- Configuración `appsettings.json`
-- Middleware registrado
-
----
-
-## Fase 2 — Fundamentos y Validaciones ✅
-
-**Estado:** Completada
-
-**Logros:**
-- Enums centralizados: `DocumentType`, `SummaryStyle`, `ProcessingStatus`, `StreamEventType`
-- Constants: `MimeTypes`, `SseEvents`, `GroqModels`, `PromptNames`
-- Value Objects: `DocumentContent`, `TokenLimits`, `SummaryOptions`, `ChunkData`
-- Exceptions especializadas: 5 custom exceptions
-- DTOs estructurados: Request/Response
-- Validators: `SummaryRequestValidator`
-- Helpers: `FileHelper`, `StreamHelper`, `TokenHelper`
-- Result Pattern: `Result<T>` y `Result`
-- Configuraciones typed: `OcrOptions`, `ChunkingOptions`, `SummaryOptions`
-
-**Estructura:**
-- Domain: Enums, Exceptions, Value Objects
-- Application: DTOs, Validators, Interfaces
-- Shared: Helpers, Result Pattern
-
----
-
-## Fase 3 — Pipeline de Documentos y OCR ✅
-
-**Estado:** Completada (15 de mayo de 2026)
-
-**Logros Principales:**
-- ✅ Soporte completo para TXT
-- ✅ Extracción PDF con PdfPig
-- ✅ Renderización PDF a imágenes
-- ✅ OCR automático con Tesseract
-- ✅ Normalización de texto
-- ✅ Pipeline inteligente OCR
-- ✅ Arquitectura desacoplada
-- ✅ Logging estratégico
-- ✅ Compilación exitosa
-
-**Componentes Implementados:**
-
-### Parsers (3)
-- `TxtDocumentParser` — Lectura TXT
-- `PdfTextExtractor` — Extracción nativa PDF
-- `PdfRenderer` — Renderización a imágenes
-
-### Estrategias (1)
-- `PdfOcrDetectionStrategy` — Decisión inteligente OCR
-
-### Orquestadores (4)
-- `SmartPdfProcessor` — Procesamiento PDF inteligente
-- `DocumentParserFactory` — Fábrica de parsers
-- `DocumentProcessingService` — Orquestador principal
-- `PdfOcrExtractor` — Extracción OCR
-
-### Normalización (1)
-- `TextNormalizer` — Limpieza y normalización
-
-**Criterios Completados:**
-- [x] TXT parsing funciona
-- [x] PDF parsing funciona
-- [x] OCR funciona
-- [x] OCR fallback funciona
-- [x] PDFs escaneados funcionan
-- [x] Normalización funciona
-- [x] Exceptions funcionan
-- [x] Logging funciona
-- [x] Cancellation tokens funcionan
-- [x] Arquitectura sigue limpia
-- [x] La solución compila
-- [x] El texto final queda listo para chunking
-
----
-
-## Fase 4 — Chunking de Documentos ⏳
-
-**Estado:** En Preparación
-
-**Objetivos:**
-- Segmentación inteligente de texto
-- Control de tokens
-- Múltiples estrategias de chunking
-- Validación de fragmentos
-
-**Pasos Pendientes:**
-1. [ ] Crear interfaces `ITextChunker`, `ITokenEstimator`
-2. [ ] Implementar `TokenEstimator`
-3. [ ] Implementar `FixedSizeTextChunker`
-4. [ ] Implementar `SemanticTextChunker`
-5. [ ] Implementar `TextChunkerFactory`
-6. [ ] Implementar `ChunkingService`
-7. [ ] Agregar logging y validaciones
-8. [ ] Tests básicos
-
-**Estimación:** ~2-3 días de desarrollo
-
----
-
-## Fase 5 — Summarization (MAP-Reduce) ⏳
-
-**Estado:** No iniciada
-
-**Objetivos:**
-- Integración Groq + Semantic Kernel
-- MAP phase: Resumen individual por chunk
-- REDUCE phase: Consolidación de resúmenes
-- Streaming SSE completo
-
-**Pasos Principales:**
-1. [ ] Implementar `IStreamingTextGenerator`
-2. [ ] Integrar Groq API
-3. [ ] MAP phase implementation
-4. [ ] REDUCE phase implementation
-5. [ ] Streaming SSE
-6. [ ] Manejo de errores LLM
-
----
-
-## Métricas de Código
-
-### Archivos por Capa
-
-**Domain (22 files)**
-- Enums: 5
-- Exceptions: 5
-- Value Objects: 5
-- Constants: 2
-- Otros: 5
-
-**Application (15 files)**
-- Interfaces: 10
-- DTOs: 5
-- Validators: 2
-- Otros: -
-
-**Infrastructure (30+ files)**
-- Services: 6
-- Parsers: 4
-- Strategies: 1
-- Documents: Subdividido en carpetas
-- DependencyInjection: 1
-- Otros: -
-
-**API (5 files)**
-- Program.cs: 1
-- Middleware: 2
-- Configurations: 2
-
-**Shared (10 files)**
-- Helpers: 3
-- Results: 2
-- Otros: 5
-
-**Tests (2+ files)**
-- Tests básicos preparados
-
-### Líneas de Código Aproximadas
-- Domain: ~500 LOC
-- Application: ~1000 LOC
-- Infrastructure: ~2500 LOC
-- API: ~200 LOC
-- Shared: ~400 LOC
-- **Total: ~4600 LOC**
-
----
-
-## Dependencias Externas Instaladas
-
-| Paquete | Versión | Propósito |
-|---------|---------|----------|
-| Serilog | - | Logging |
-| Swashbuckle | - | Swagger |
-| FluentValidation | - | Validación |
-| Polly | 8.6.6 | Resiliencia |
-| UglyToad.PdfPig | 1.7.0-custom-5 | Extracción PDF |
-| Tesseract | 5.2.0 | OCR |
-| Docnet.Core | 2.6.0 | Render PDF |
-| Microsoft.SemanticKernel | 1.76.0 | Orquestación LLM |
-
----
-
-## Próximos Pasos Inmediatos
-
-### Corto Plazo (1-2 semanas)
-1. ✅ Completar Fase 4 (Chunking)
-2. Implementar interfaces Chunking
-3. Fixed-size chunker
-4. Semantic chunker
-
-### Mediano Plazo (2-4 semanas)
-1. Completar Fase 5 (Summarization)
-2. Integración Groq
-3. MAP-REDUCE phases
-4. Streaming SSE real
-
-### Largo Plazo
-1. Tests exhaustivos
-2. Performance tuning
-3. Manejo de edge cases
-4. Documentación completa
-
----
-
-## Notas Técnicas
-
-### Arquitectura
-- ✅ Capas bien separadas
-- ✅ Inyección de dependencias centralizada
-- ✅ Interfaces en Application
-- ✅ Implementaciones en Infrastructure
-- ✅ Domain desacoplado
-
-### Calidad de Código
-- ✅ Logging estratégico
-- ✅ Excepciones tipadas
-- ✅ Cancellation tokens
-- ✅ Manejo de recursos
-- ✅ Configuración tipada
-
-### Puntos de Mejora
-- Tests unitarios (Fase 4+)
-- Tests de integración (Fase 5+)
-- Performance benchmarks
-- Documentación de API
-- Error recovery patterns
-
----
-
-## Contacto y Referencias
-
-- **Documentación técnica:** `Context.md`
-- **Documentación Fase 0:** `Fase 0.md`
-- **Documentación Fase 1:** `Fase 1.md`
-- **Documentación Fase 2:** `Fase 2.md`
-- **Documentación Fase 3:** `Fase 3.md` ✅
-- **Documentación Fase 4:** `Fase 4.md` ⏳
-- **Especificación de Proyecto:** `README.md`
+**Ultima actualizacion:** 15 de mayo de 2026
+
+## Estado Consolidado (Fases 0-3)
+
+| Item | Estado |
+|---|---|
+| Fase 0 - Arquitectura | Completada |
+| Fase 1 - Scaffold y base tecnica | Completada |
+| Fase 2 - Contratos y dominio | Completada |
+| Fase 3 - Pipeline documentos + OCR | Completada |
+| Compilacion de solucion | Exitosa |
+| Preparado para Fase 4 (Chunking) | Si |
+
+## Resumen Ejecutivo
+
+Se consolidaron las fases 0-3 en una base funcional y coherente del microservicio:
+
+- Arquitectura limpia definida y respetada (capas desacopladas, dependencias correctas).
+- Solucion y proyectos configurados sobre .NET 9 con DI, logging, validaciones y health checks.
+- Contratos estables del dominio y aplicacion (DTOs, enums, constants, value objects, excepciones).
+- Pipeline documental operativo para PDF/TXT con fallback OCR y normalizacion de texto.
+
+Resultado: el sistema ya puede recibir documentos, extraer/recuperar texto confiable y dejarlo listo para la fase de chunking y luego summarization.
+
+## Entregables Completados por Fase
+
+### Fase 0 - Definicion tecnica y arquitectura
+
+- Objetivo y alcance del microservicio definidos.
+- Stack tecnologico confirmado (.NET 9, Minimal APIs, SSE, Serilog, Polly, FluentValidation, PdfPig, Tesseract, PDF renderer, Semantic Kernel).
+- Flujo funcional end-to-end especificado (ingesta -> extraccion/OCR -> normalizacion -> chunking -> resumen -> reduce -> stream).
+- Contratos SSE y estados de procesamiento definidos.
+- Reglas tecnicas y de arquitectura formalizadas (sin magic strings, async/cancellation token, dominio aislado de infraestructura).
+
+### Fase 1 - Scaffold de solucion y configuracion base
+
+- Estructura de solucion creada y organizada en capas:
+	- SummaryService.Api
+	- SummaryService.Application
+	- SummaryService.Domain
+	- SummaryService.Infrastructure
+	- SummaryService.Shared
+- Referencias entre proyectos alineadas a Clean Architecture.
+- Configuracion base implementada:
+	- Serilog (logging estructurado)
+	- Swagger/OpenAPI
+	- Health checks
+	- FluentValidation
+	- Polly
+	- appsettings y options tipadas
+
+### Fase 2 - Contratos, dominio y estructuras base
+
+- Enums del dominio centralizados (tipos de documento, estilo de resumen, eventos de stream, estados de proceso).
+- Constants del dominio para mime types, eventos SSE, prompts y modelos.
+- Value objects principales implementados.
+- DTOs de request/response definidos para API y streaming.
+- Validaciones base de request implementadas.
+- Excepciones tipadas y helpers compartidos consolidados.
+- Result pattern aplicado para manejo consistente de resultados.
+
+### Fase 3 - Pipeline de documentos y OCR
+
+- Soporte funcional para TXT.
+- Extraccion de texto nativo en PDF.
+- Estrategia de deteccion para activar OCR cuando el texto es insuficiente.
+- Render de paginas PDF a imagen para OCR.
+- OCR por pagina y consolidacion de contenido.
+- Normalizacion final del texto para consumo aguas abajo.
+- Orquestacion desacoplada del pipeline con logging y cancellation token.
+
+## Estado Tecnico Actual
+
+- Arquitectura: estable y mantenida.
+- Pipeline documental: operativo (PDF/TXT + OCR fallback).
+- Calidad base: logging, configuracion tipada, validaciones y manejo de errores.
+- Compilacion: correcta.
+- Tests: aun pendientes de cobertura amplia en fases siguientes.
+
+## Pendiente Inmediato
+
+### Fase 4 - Chunking
+
+- Implementar interfaces y servicios de segmentacion de texto.
+- Estimacion/control de tokens por fragmento.
+- Estrategias de chunking (tamano fijo y semantico).
+- Validaciones y pruebas base.
+
+### Fase 5 - Summarization MAP-REDUCE
+
+- Integracion Groq + Semantic Kernel.
+- Resumen por chunk (MAP) y consolidacion final (REDUCE).
+- Streaming SSE completo de respuesta final.
+
+## Referencias
+
+- Contexto tecnico: Context.md
+- Fase 0: Fase 0.md
+- Fase 1: Fase 1.md
+- Fase 2: Fase 2.md
+- Fase 3: Fase 3.md
